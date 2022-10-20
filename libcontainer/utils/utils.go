@@ -119,7 +119,10 @@ func WithProcfd(root, unsafePath string, fn func(procfd string) error) error {
 		return fmt.Errorf("open o_path procfd: %w", err)
 	}
 	defer fh.Close()
-
+	//data, _ := os.Readlink("src") //我的linux返回的是/home/widuu/go/src
+	//os.ReadLink()函数原形是func Readlink(name string) (string, error)输入的是链接的名称返回的是目标文件和err
+	//进程可以通过访问/proc/self/目录来获取自己的系统信息，而不用每次都获取pid。这个目录比较独特，
+	//不同的进程访问该目录时获得的信息时不同的，内容等价于/proc/本进程pid/
 	// Double-check the path is the one we expected.
 	procfd := "/proc/self/fd/" + strconv.Itoa(int(fh.Fd()))
 	if realpath, err := os.Readlink(procfd); err != nil {
