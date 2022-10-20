@@ -99,6 +99,13 @@ func stripRoot(root, path string) string {
 	return CleanPath("/" + path)
 }
 
+//fd是一个目录，里面包含着当前进程打开的每一个文件的描述符（file descriptor）差不多就是路径啦，
+//这些文件描述符是指向实际文件的一个符号连接，即每个通过这个进程打开的文件都会显示在这里。所以我们可以通过fd目录的文件获取进程，从而打开每个文件的路径以及文件内容。
+
+//这个fd比较重要，因为在Linux系统中，如果一个程序用 open() 打开了一个文件，但是最终没有关闭它，即使从外部（如：os.remove(SECRET_FILE))删除这个文件之后，
+//在/proc这个进程的 pid目录下的fd文件描述符 目录下 还是会有这个文件的文件描述符，通过这个文件描述符我们即可以得到被删除的文件的内容
+//原文链接：https://blog.csdn.net/Zero_Adam/article/details/114853022
+
 // WithProcfd runs the passed closure with a procfd path (/proc/self/fd/...)
 // corresponding to the unsafePath resolved within the root. Before passing the
 // fd, this path is verified to have been inside the root -- so operating on it
@@ -119,6 +126,7 @@ func WithProcfd(root, unsafePath string, fn func(procfd string) error) error {
 		return fmt.Errorf("open o_path procfd: %w", err)
 	}
 	defer fh.Close()
+
 	//data, _ := os.Readlink("src") //我的linux返回的是/home/widuu/go/src
 	//os.ReadLink()函数原形是func Readlink(name string) (string, error)输入的是链接的名称返回的是目标文件和err
 	//进程可以通过访问/proc/self/目录来获取自己的系统信息，而不用每次都获取pid。这个目录比较独特，
