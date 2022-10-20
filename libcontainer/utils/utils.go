@@ -66,11 +66,17 @@ func CleanPath(path string) string {
 
 	// Ensure that all paths are cleaned (especially problematic ones like
 	// "/../../../../../" which can cause lots of issues).
+
+	//Clean函数通过单纯的词法操作返回和path代表同一地址的最短路径。
+
 	path = filepath.Clean(path)
 
 	// If the path isn't absolute, we need to do more processing to fix paths
 	// such as "../../../../<etc>/some/path". We also shouldn't convert absolute
 	// paths to relative ones.
+
+	//IsAbs返回路径是否是一个绝对路径。
+
 	if !filepath.IsAbs(path) {
 		path = filepath.Clean(string(os.PathSeparator) + path)
 		// This can't fail, as (by definition) all paths are relative to root.
@@ -93,7 +99,9 @@ func stripRoot(root, path string) string {
 		path = "/"
 	case root == "/":
 		// do nothing
+		//strings.HasPrefix函数用来检测字符串是否以指定的前缀开头
 	case strings.HasPrefix(path, root+"/"):
+		//strings.TrimPrefix(s,str)删除s头部的prefix字符串。如果s不是以prefix开头，则返回原始s
 		path = strings.TrimPrefix(path, root+"/")
 	}
 	return CleanPath("/" + path)
@@ -112,6 +120,7 @@ func stripRoot(root, path string) string {
 // through the passed fdpath should be safe. Do not access this path through
 // the original path strings, and do not attempt to use the pathname outside of
 // the passed closure (the file handle will be freed once the closure returns).
+//对需要挂载的目标路径进行合法判断
 func WithProcfd(root, unsafePath string, fn func(procfd string) error) error {
 	// Remove the root then forcefully resolve inside the root.
 	unsafePath = stripRoot(root, unsafePath)
@@ -132,6 +141,9 @@ func WithProcfd(root, unsafePath string, fn func(procfd string) error) error {
 	//进程可以通过访问/proc/self/目录来获取自己的系统信息，而不用每次都获取pid。这个目录比较独特，
 	//不同的进程访问该目录时获得的信息时不同的，内容等价于/proc/本进程pid/
 	// Double-check the path is the one we expected.
+
+	//Itoa()函数用于将int类型数据转换为对应的字符串表示
+
 	procfd := "/proc/self/fd/" + strconv.Itoa(int(fh.Fd()))
 	if realpath, err := os.Readlink(procfd); err != nil {
 		return fmt.Errorf("procfd verification failed: %w", err)
