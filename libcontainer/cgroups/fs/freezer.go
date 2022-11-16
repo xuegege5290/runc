@@ -60,7 +60,7 @@ func (s *FreezerGroup) Set(path string, r *configs.Resources) (Err error) {
 		//暂停方式一：
 		//duration := time.Duration(10)*time.Second // Pause for 10 seconds任意增加持续时间。
 		//time.Sleep(duration) 将程序暂停duration时间段。
-		//暂停方式二：
+		//暂停方式二(可以暂停直到按下Enter键，方法是创建一个等待读取换行符（\n）字符的新缓冲区读取器)：
 		//bufio.NewReader(os.Stdin).ReadBytes('\n')
 		for i := 0; i < 1000; i++ {
 			if i%50 == 49 {
