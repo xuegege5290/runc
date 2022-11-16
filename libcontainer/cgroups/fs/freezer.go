@@ -57,7 +57,11 @@ func (s *FreezerGroup) Set(path string, r *configs.Resources) (Err error) {
 		//
 		// Alas, this is still a game of chances, since the real fix
 		// belong to the kernel (cgroup v2 do not have this bug).
-
+		//暂停方式一：
+		//duration := time.Duration(10)*time.Second // Pause for 10 seconds任意增加持续时间。
+		//time.Sleep(duration) 将程序暂停duration时间段。
+		//暂停方式二：
+		//bufio.NewReader(os.Stdin).ReadBytes('\n')
 		for i := 0; i < 1000; i++ {
 			if i%50 == 49 {
 				// Occasional thaw and sleep improves
